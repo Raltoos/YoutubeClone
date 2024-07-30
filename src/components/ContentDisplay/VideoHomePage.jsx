@@ -70,7 +70,7 @@ export default function VideoHomePage({ isOpen }) {
           />
         </div>
       </div>
-      <LoadVideos handleClick={handleLoadingBar} isOpen={isOpen}/>
+      <LoadVideos handleLoadingBar={handleLoadingBar} isOpen={isOpen}/>
     </div>
   );
 }

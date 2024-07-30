@@ -1,33 +1,52 @@
+/* eslint-disable react/prop-types */
 import Header from "./components/Header.jsx";
 import SideBar from "./components/Sidebar/SideBar.jsx";
 import VideoHomePage from "./components/ContentDisplay/VideoHomePage.jsx";
+import VideoPlayerPage from "./components/VideoPlayerPage/VideoPlayerPage.jsx";
 import SideBarClosed from "./components/Sidebar/SideBarClosed.jsx";
 
 import { SearchQueryContext } from "./store/search-query-context.jsx";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { VideoPageContext, VideoPageProvider } from "./store/video-page-context.jsx";
 
 export default function App() {
-  const [searchQuery, setSearchQuery] = useState("f1")
-  const [open, setOpen] = useState(true)
+  const [searchQuery, setSearchQuery] = useState("React JS");
+  const [isSideBarOpen, setIsSideBarOpen] = useState(true);
 
-  const cntxtValue = {
+  const searchQueryContextValue = {
     searchQuery,
-    setSearchQuery
-  }
+    setSearchQuery,
+  };
 
-  function handleClick(){
-    setOpen((prev) => !prev);
+  function handleToggleSideBar() {
+    setIsSideBarOpen((prev) => !prev);
   }
 
   return (
-    <SearchQueryContext.Provider value={cntxtValue}>
-      <div className="w-screen h-screen bg-[#0f0f0f] font-sans flex flex-col overflow-hidden">
-        <Header handleToggle={handleClick}/>
-        <div className="flex">
-          {open ? <SideBar /> : <SideBarClosed />}
-          <VideoHomePage isOpen={open}/>
-        </div>
-      </div>
+    <SearchQueryContext.Provider value={searchQueryContextValue}>
+      <VideoPageProvider>
+        <AppContent handleToggleSideBar={handleToggleSideBar} isSideBarOpen={isSideBarOpen} />
+      </VideoPageProvider>
     </SearchQueryContext.Provider>
+  );
+}
+
+function AppContent({ handleToggleSideBar, isSideBarOpen }) {
+  const { videoPageOpen } = useContext(VideoPageContext);
+
+  return (
+    <div className="w-screen h-screen bg-[#0f0f0f] font-sans flex flex-col overflow-hidden">
+      <Header handleToggle={handleToggleSideBar} />
+      <div className="flex">
+        {videoPageOpen[0] ? (
+          <VideoPlayerPage videoId={videoPageOpen[1]} />
+        ) : (
+          <div className="flex">
+            {isSideBarOpen ? <SideBar /> : <SideBarClosed />}
+            <VideoHomePage isOpen={isSideBarOpen} />
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

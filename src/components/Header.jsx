@@ -5,14 +5,14 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 
 import SearchBar from "./SearchBar";
-import { SearchQueryContext } from "../store/search-query-context.jsx";
+import { VideoPageContext } from "../store/video-page-context.jsx";
 import { useContext } from "react";
 
 export default function Header({ handleToggle }) {
-  const { setSearchQuery } = useContext(SearchQueryContext);
+  const { setVideoPageOpen } = useContext(VideoPageContext);
 
   function handleClick() {
-    setSearchQuery('f1');
+    setVideoPageOpen([false, ""]);
   }
 
   return (

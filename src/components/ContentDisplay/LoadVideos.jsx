@@ -1,14 +1,16 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState, useContext } from "react";
 import { SearchQueryContext } from "../../store/search-query-context";
+import { VideoPageContext } from "../../store/video-page-context";
 import axios from "axios";
 
-export default function LoadVideos({ handleClick, isOpen }) {
+export default function LoadVideos({ handleLoadingBar, isOpen }) {
   const [backEndData, setBackEndData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
   const { searchQuery } = useContext(SearchQueryContext);
+  const { setVideoPageOpen } = useContext(VideoPageContext);
 
   useEffect(() => {
     const cacheKey = `videos_${searchQuery}`;
@@ -32,6 +34,11 @@ export default function LoadVideos({ handleClick, isOpen }) {
         setLoading(false);
       });
   }, [searchQuery]);
+
+  function handleClick(video) {
+    handleLoadingBar();
+    setVideoPageOpen([true, video.videoID]);
+  }
 
   if (loading) {
     return (

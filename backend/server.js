@@ -43,19 +43,21 @@ app.get('/search', async (req, res) => {
         });
 
         if (videoResponse.data.items.length > 0) {
-            const data = videoResponse.data.items.map(video => {
+            const data = videoResponse.data.items.map((video, key) => {
                 const thumbnailUrl = video.snippet.thumbnails.high.url
                 const videoTitle = video.snippet.title
                 const videoDate = timeSince(video.snippet.publishedAt)
                 const viewCount = convertToInternationalCurrencySystem(video.statistics.viewCount)
                 const channelName = video.snippet.channelTitle
+                const videoID = searchResponse.data.items[key].id.videoId
 
                 return {
                     thumbnailUrl,
                     videoTitle,
                     videoDate,
                     viewCount,
-                    channelName
+                    channelName,
+                    videoID
                 }
             });
             res.json(data);
