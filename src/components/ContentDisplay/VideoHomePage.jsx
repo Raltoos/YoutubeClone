@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import TagDisplay from "./TagDisplay";
+import ScrollableTagDisplay from "./ScrollableTagDisplay";
 import LoadingBar from "./LoadingBar";
 import { useState } from "react";
 import LoadVideos from "./LoadVideos";
@@ -30,7 +30,7 @@ export default function VideoHomePage({ isOpen }) {
   }
 
   return (
-    <div className="w-auto h-screen overflow-y-auto overflow-x-hidden pl-6">
+    <div className="w-auto h-screen pb-16 overflow-x-hidden pl-6">
       {progress > 0 && <LoadingBar progress={progress} />}
       <div className="w-full flex items-center">
         <div className="w-10">
@@ -42,24 +42,7 @@ export default function VideoHomePage({ isOpen }) {
           />}
         </div>
         <div className="w-12/12 overflow-hidden">
-          <div
-            style={{ transform: `translateX(-${translation}px)` }}
-            className="h-12 w-full my-1 flex items-center gap-3 transition-all"
-          >
-            <TagDisplay>All</TagDisplay>
-            <TagDisplay>Gaming</TagDisplay>
-            <TagDisplay>Fomula 1</TagDisplay>
-            <TagDisplay>Development</TagDisplay>
-            <TagDisplay>Mixes</TagDisplay>
-            <TagDisplay>Playlists</TagDisplay>
-            <TagDisplay>Trackmania</TagDisplay>
-            <TagDisplay>Comedy</TagDisplay>
-            <TagDisplay>Anime</TagDisplay>
-            <TagDisplay>Role-Playing Games</TagDisplay>
-            <TagDisplay>Recently Uploaded</TagDisplay>
-            <TagDisplay>Watched</TagDisplay>
-            <TagDisplay>New to you</TagDisplay>
-          </div>
+          <ScrollableTagDisplay translation={translation} />
         </div>
         <div className="w-10">
           <MdOutlineKeyboardArrowRight

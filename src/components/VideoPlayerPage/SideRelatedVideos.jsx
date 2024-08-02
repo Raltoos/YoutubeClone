@@ -4,7 +4,7 @@ import { SearchQueryContext } from "../../store/SearchQuery/search-query-context
 import { VideoPageContext } from "../../store/VideoPage/video-page-context";
 import axios from "axios";
 
-export default function LoadVideos({ handleLoadingBar, isOpen }) {
+export default function SideRelatedVideos() {
   const [backEndData, setBackEndData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,8 +12,15 @@ export default function LoadVideos({ handleLoadingBar, isOpen }) {
   const { searchQuery } = useContext(SearchQueryContext);
   const { setVideoPageOpen } = useContext(VideoPageContext);
 
+  const relatedTerms = ["new", "related", "latest", "more"];
+  function getRandomInt(min, max) {
+    const minCeiled = Math.ceil(min);
+    const maxFloored = Math.floor(max);
+    return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
+  }
+
   useEffect(() => {
-    const cacheKey = `videos_${searchQuery}`;
+    const cacheKey = `SideVideos_${searchQuery}`;
     const cachedResults = localStorage.getItem(cacheKey);
 
     if (cachedResults) {
@@ -22,7 +29,7 @@ export default function LoadVideos({ handleLoadingBar, isOpen }) {
     }
 
     axios
-      .get(`/api/search?q=${encodeURIComponent(searchQuery)}&no=12`)
+      .get(`/api/search?q=${encodeURIComponent(searchQuery)}+${relatedTerms[getRandomInt(0,4)]}&no=17`)
       .then((response) => {
         setBackEndData(response.data);
         localStorage.setItem(cacheKey, JSON.stringify(response.data));
@@ -36,7 +43,7 @@ export default function LoadVideos({ handleLoadingBar, isOpen }) {
   }, [searchQuery]);
 
   function handleClick(video) {
-    handleLoadingBar();
+    // handleLoadingBar();
     setVideoPageOpen([true, video.videoID, video.channelId, video.videoDate]);
   }
 
@@ -53,21 +60,21 @@ export default function LoadVideos({ handleLoadingBar, isOpen }) {
   }
 
   return (
-    <div className={`w-full grid sm:grid-cols-1 ${isOpen ? 'md:grid-cols-3' : 'md:grid-cols-4'} gap-6 p-4`}>
+    <div className={`w-full h-fit flex flex-col gap-6 p-4`}>
       {backEndData.map((video, index) => (
         <div
           key={index}
-          className="rounded-lg overflow-hidden transition-transform transform hover:scale-105 cursor-pointer"
+          className="rounded-lg overflow-hidden transition-transform transform hover:scale-105 cursor-pointer flex"
           onClick={() => handleClick(video)}
         >
-          <div className="relative w-full h-0 bg-[#272727] pb-[56.25%]">
+          <div className="w-[200px] h-[150px] bg-[#272727]">
             <img
               src={video.thumbnailUrl}
               alt={`Thumbnail ${index}`}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="w-full h-full object-cover"
             />
           </div>
-          <div className="p-4 flex flex-col">
+          <div className="w-[270px] p-4 flex flex-col">
             <h2 className="text-md font-innterTight text-white">
               {video.videoTitle}
             </h2>

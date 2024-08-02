@@ -1,5 +1,5 @@
 import { useContext, useRef, useState } from "react";
-import { SearchQueryContext } from "../store/search-query-context";
+import { SearchQueryContext } from "../store/SearchQuery/search-query-context";
 import LoadingBar from "./ContentDisplay/LoadingBar";
 import { FaSearch } from "react-icons/fa";
 import { MdKeyboardVoice } from "react-icons/md";
@@ -8,6 +8,7 @@ import debounce from "lodash.debounce";
 export default function SearchBar() {
   const text = useRef();
   const [searchText, setSearchText] = useState("");
+  
   const { setSearchQuery } = useContext(SearchQueryContext);
   const [progress, setProgress] = useState(0);
 
@@ -17,15 +18,10 @@ export default function SearchBar() {
     setTimeout(() => setProgress(0), 1500);
   }
 
-  // Debounced function
   const handleSearch = debounce((query) => {
     handleLoadingBar()
     setSearchQuery(query);
-  }, 300);
-
-  function handleClick() {
-    handleSearch(searchText);
-  }
+  }, 1000);
 
   function handleKeyDown(event) {
     if (event.key === "Enter") {
@@ -43,12 +39,12 @@ export default function SearchBar() {
         className="px-5 pb-1 bg-[#0f0f0f] h-full w-1/2 rounded-l-full focus:outline-none caret-white text-white"
         style={{ border: "2px solid #222222" }}
         onChange={() => setSearchText(text.current.value)}
-        onKeyDown={handleKeyDown} // Add key down handler
+        onKeyDown={handleKeyDown}
         value={searchText}
       />
       <button
         className="bg-[#222222] h-10 px-4 rounded-r-3xl"
-        onClick={handleClick}
+        onClick={() => handleSearch(searchText)}
       >
         <FaSearch color="#979797" />
       </button>
