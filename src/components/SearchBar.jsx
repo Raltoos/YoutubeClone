@@ -1,5 +1,6 @@
 import { useContext, useRef, useState } from "react";
 import { SearchQueryContext } from "../store/SearchQuery/search-query-context";
+import { VideoPageContext } from "../store/VideoPage/video-page-context";
 import LoadingBar from "./ContentDisplay/LoadingBar";
 import { FaSearch } from "react-icons/fa";
 import { MdKeyboardVoice } from "react-icons/md";
@@ -10,6 +11,7 @@ export default function SearchBar() {
   const [searchText, setSearchText] = useState("");
   
   const { setSearchQuery } = useContext(SearchQueryContext);
+  const { setVideoPageOpen } = useContext(VideoPageContext);
   const [progress, setProgress] = useState(0);
 
   function handleLoadingBar() {
@@ -21,6 +23,7 @@ export default function SearchBar() {
   const handleSearch = debounce((query) => {
     handleLoadingBar()
     setSearchQuery(query);
+    setVideoPageOpen([false, "", "", ""]);
   }, 1000);
 
   function handleKeyDown(event) {
