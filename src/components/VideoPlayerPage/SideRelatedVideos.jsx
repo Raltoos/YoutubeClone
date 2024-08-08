@@ -60,21 +60,21 @@ export default function SideRelatedVideos() {
   }
 
   return (
-    <div className={`w-full h-fit flex flex-col gap-6 p-4`}>
+    <div className={`w-full h-fit flex flex-col gap-6 pl-6`}>
       {backEndData.map((video, index) => (
         <div
           key={index}
           className="rounded-lg overflow-hidden transition-transform transform hover:scale-105 cursor-pointer flex"
           onClick={() => handleClick(video)}
         >
-          <div className="w-[200px] h-[150px] bg-[#272727]">
+          <div className="w-[180px] h-[130px] bg-[#272727]">
             <img
               src={video.thumbnailUrl}
               alt={`Thumbnail ${index}`}
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="w-[270px] p-4 flex flex-col">
+          <div className="w-[220px] p-4 flex flex-col">
             <h2 className="text-md font-innterTight text-white">
               {video.videoTitle}
             </h2>

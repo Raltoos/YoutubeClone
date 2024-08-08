@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { SearchQueryContext } from "../../store/SearchQuery/search-query-context";
 import { VideoPageContext } from "../../store/VideoPage/video-page-context";
-import axios from "axios";
+import useSearchFetch from "../../helper/SearchFetch";
 
 export default function LoadVideos({ handleLoadingBar, isOpen }) {
   const [backEndData, setBackEndData] = useState([]);
@@ -12,28 +12,7 @@ export default function LoadVideos({ handleLoadingBar, isOpen }) {
   const { searchQuery } = useContext(SearchQueryContext);
   const { setVideoPageOpen } = useContext(VideoPageContext);
 
-  useEffect(() => {
-    const cacheKey = `videos_${searchQuery}`;
-    const cachedResults = localStorage.getItem(cacheKey);
-
-    if (cachedResults) {
-      setBackEndData(JSON.parse(cachedResults));
-      setLoading(false);
-    }
-
-    axios
-      .get(`/api/search?q=${encodeURIComponent(searchQuery)}&no=12`)
-      .then((response) => {
-        setBackEndData(response.data);
-        localStorage.setItem(cacheKey, JSON.stringify(response.data));
-      })
-      .catch((error) => {
-        setError(error.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [searchQuery]);
+  useSearchFetch(searchQuery, setLoading, setError, setBackEndData);
 
   function handleClick(video) {
     handleLoadingBar();
