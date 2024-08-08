@@ -1,24 +1,28 @@
 /* eslint-disable react/prop-types */
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import AppContent from "./components/AppContent.jsx";
+
+import { useState } from "react";
 import { VideoPageProvider } from "./store/VideoPage/VideoPageProvider.jsx";
 import { SearchQueryProvider } from "./store/SearchQuery/SearchQueryProvider.jsx";
-import HomePage from "./pages/HomePage.jsx";
-import LoginPage from "./pages/LoginPage.jsx";
-import {UserLoginProvider} from "./store/LoginCreds/userLoginContext.jsx"
 
 export default function App() {
-  const router = createBrowserRouter([
-    { path: "/", element: <HomePage /> },
-    { path: "login", element: <LoginPage /> },
-  ]);
+  
+  const [isSideBarOpen, setIsSideBarOpen] = useState(true);
+
+  function handleToggleSideBar() {
+    setIsSideBarOpen((prev) => !prev);
+  }
 
   return (
     <SearchQueryProvider>
       <VideoPageProvider>
-        <UserLoginProvider>
-          <RouterProvider router={router} />
-        </UserLoginProvider>
+        <AppContent
+          handleToggleSideBar={handleToggleSideBar}
+          isSideBarOpen={isSideBarOpen}
+        />
       </VideoPageProvider>
     </SearchQueryProvider>
   );
 }
+
+
