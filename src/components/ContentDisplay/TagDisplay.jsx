@@ -2,9 +2,10 @@
 import { useContext } from "react";
 import { SearchQueryContext } from "../../store/SearchQuery/search-query-context";
 
-export default function TagDisplay({ children }) {
+export default function TagDisplay({ loadinBar, children }) {
   const { setSearchQuery } = useContext(SearchQueryContext);
   function handleClick() {
+    loadinBar();
     setSearchQuery(children)
   }
 

@@ -42,7 +42,7 @@ export default function VideoHomePage({ isOpen }) {
           />}
         </div>
         <div className="w-12/12 overflow-hidden">
-          <ScrollableTagDisplay translation={translation} />
+          <ScrollableTagDisplay translation={translation} handleLoadingBar={handleLoadingBar}/>
         </div>
         <div className="w-10">
           <MdOutlineKeyboardArrowRight

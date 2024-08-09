@@ -60,7 +60,7 @@ export default function SideRelatedVideos() {
   }
 
   return (
-    <div className={`w-full h-fit flex flex-col gap-6 p-4`}>
+    <div className={`w-full h-fit flex flex-col gap-6 ml-5`}>
       {backEndData.map((video, index) => (
         <div
           key={index}
@@ -74,7 +74,7 @@ export default function SideRelatedVideos() {
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="w-[270px] p-4 flex flex-col">
+          <div className="w-[210px] p-3 flex flex-col">
             <h2 className="text-md font-innterTight text-white">
               {video.videoTitle}
             </h2>
