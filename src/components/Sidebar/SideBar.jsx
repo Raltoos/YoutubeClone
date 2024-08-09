@@ -18,7 +18,7 @@ import SideBarTab from "./SideBarTab";
 
 export default function SideBar() {
   return (
-    <div className="md:w-4/12 h-[calc(100vh-64px)] sticky overflow-hidden hover:overflow-y-scroll hover:overflow-x-hidden hover:scrollbar-thin hover:scrollbar-webkit hover:outline-none flex flex-col items-start gap-3">
+    <div className="md:w-3/12 h-[calc(100vh-64px)] sticky overflow-hidden hover:overflow-y-scroll hover:overflow-x-hidden hover:scrollbar-thin hover:scrollbar-webkit hover:outline-none flex flex-col items-start gap-3">
       <div className="flex flex-col mt-4">
         <SideBarTab>
           <MdHomeFilled color="white" size="1.4rem" /> Home

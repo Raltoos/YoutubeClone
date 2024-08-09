@@ -30,7 +30,7 @@ export default function VideoHomePage({ isOpen }) {
   }
 
   return (
-    <div className="w-auto h-screen pb-16 overflow-x-hidden pl-6">
+    <div className="w-full h-screen pb-16 overflow-x-hidden pl-6">
       {progress > 0 && <LoadingBar progress={progress} />}
       <div className="w-full flex items-center">
         <div className="w-10">
