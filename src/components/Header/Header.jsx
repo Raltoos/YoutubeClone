@@ -7,14 +7,15 @@ import { AiOutlineVideoCameraAdd } from "react-icons/ai";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 import SearchBar from "../SearchBar.jsx";
-import { VideoPageContext } from "../../store/VideoPage/video-page-context.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function Header({ handleToggle }) {
-  const { setVideoPageOpen } = useContext(VideoPageContext);
   const { user, setUser } = useContext(UserAuthContext);
 
+  const navigate = useNavigate()
+
   function handleClick() {
-    setVideoPageOpen([false, ""]);
+    navigate("../")
   }
 
   const handleSignIn = async () => {

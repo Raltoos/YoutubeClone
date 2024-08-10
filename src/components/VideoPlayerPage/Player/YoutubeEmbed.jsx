@@ -2,8 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import PlayerControl from "./PlayerControl";
 
-const YoutubePlayer = ({videoId}) => {
-  const VID = videoId;
+const YoutubePlayer = ({ videoId }) => {
 
   const containerRef = useRef(null);
   const playerRef = useRef(null);
@@ -27,56 +26,62 @@ const YoutubePlayer = ({videoId}) => {
 
       const tag = document.createElement("script");
       tag.src = "https://www.youtube.com/iframe_api";
-      tag.onload = () => resolve();
+      tag.onload = () => {
+        window.onYouTubeIframeAPIReady = () => {
+          setApiReady(true);
+          resolve();
+        };
+      };
       tag.onerror = () => reject(new Error("Failed to load YouTube API"));
       const firstScriptTag = document.getElementsByTagName("script")[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-      window.onYouTubeIframeAPIReady = () => {
-        setApiReady(true);
-        resolve();
-      };
     });
   }, []);
 
   const initializePlayer = useCallback(() => {
-    if (window.YT && window.YT.Player && playerRef.current) {
-      try {
-        const newPlayer = new window.YT.Player(playerRef.current, {
-          height: "100%",
-          width: "100%",
-          videoId: VID,
-          playerVars: {
-            autoplay: 1,
-            mute: 1,
-            controls: 0,
-            modestbranding: 1,
-            rel: 0,
-            showinfo: 0,
-            vq: "hd1080",
-            playsinline: 1,
-            origin: window.location.origin,
-            enablejsapi: 1,
-          },
-          events: {
-            onReady: onPlayerReady,
-            onStateChange: onPlayerStateChange,
-            onError: (e) => setError(`Player Error: ${e.data}`),
-          },
-        });
-        setPlayer(newPlayer);
-      } catch (err) {
-        setError(`Failed to initialize player: ${err.message}`);
-      }
-    } else {
-      setError("YouTube API or player element not available");
+    if (!window.YT || !window.YT.Player) {
+      console.error("YouTube API not available");
+      return;
     }
-  }, [VID]);
+
+    if (!playerRef.current) {
+      console.error("Player element not available");
+      return;
+    }
+
+    try {
+      const newPlayer = new window.YT.Player(playerRef.current, {
+        height: "100%",
+        width: "100%",
+        videoId: videoId,
+        playerVars: {
+          autoplay: 1,
+          mute: 1,
+          controls: 0,
+          modestbranding: 1,
+          rel: 0,
+          showinfo: 0,
+          vq: "hd1080",
+          playsinline: 1,
+          origin: window.location.origin,
+          enablejsapi: 1,
+        },
+        events: {
+          onReady: onPlayerReady,
+          onStateChange: onPlayerStateChange,
+          onError: (e) => setError(`Player Error: ${e.data}`),
+        },
+      });
+      setPlayer(newPlayer);
+    } catch (err) {
+      setError(`Failed to initialize player: ${err.message}`);
+    }
+  }, [videoId]);
 
   const onPlayerReady = (event) => {
     const player = event.target;
     setIsMuted(player.isMuted());
-    setVolume(0);
+    setVolume(player.getVolume());
     setDuration(player.getDuration());
   };
 
@@ -137,10 +142,10 @@ const YoutubePlayer = ({videoId}) => {
   }, [loadYouTubeAPI, player]);
 
   useEffect(() => {
-    if (apiReady) {
+    if (apiReady && videoId) {
       initializePlayer();
     }
-  }, [apiReady, initializePlayer]);
+  }, [apiReady, videoId, initializePlayer]);
 
   useEffect(() => {
     const updateTime = () => {
@@ -192,18 +197,13 @@ const YoutubePlayer = ({videoId}) => {
         player={player}
         isFullscreen={isFullscreen}
         toggleFullscreen={toggleFullscreen}
-
         isPlaying={isPlaying}
         setIsPlaying={setIsPlaying}
-
         isMuted={isMuted}
         setIsMuted={setIsMuted}
-
         volume={volume}
         setVolume={setVolume}
-
         duration={duration}
-
         currentTime={currentTime}
         setCurrentTime={setCurrentTime}
       />

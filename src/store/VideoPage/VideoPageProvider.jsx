@@ -1,20 +1,12 @@
 /* eslint-disable react/prop-types */
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { VideoPageContext } from "./video-page-context";
 
 export const VideoPageProvider = ({ children }) => {
-  const [videoPageOpen, setVideoPageOpen] = useState([false, "", ""]);
-
-  const contextValue = useMemo(
-    () => ({
-      videoPageOpen,
-      setVideoPageOpen,
-    }),
-    [videoPageOpen]
-  );
+  const [videoPageOpen, setVideoPageOpen] = useState(["", "", ""]);
 
   return (
-    <VideoPageContext.Provider value={contextValue}>
+    <VideoPageContext.Provider value={{videoPageOpen, setVideoPageOpen}}>
       {children}
     </VideoPageContext.Provider>
   );
