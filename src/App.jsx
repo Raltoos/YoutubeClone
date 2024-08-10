@@ -6,6 +6,8 @@ import { UserContextProvider } from "./store/Auth/UserContextProvider.jsx";
 import HomePage from "./pages/Home.jsx";
 import VideoPage from "./pages/Video.jsx";
 import ErrorPage from "./pages/Error.jsx";
+import SearchPage from "./pages/Search.jsx";
+
 
 export default function App() {
   const router = createBrowserRouter([
@@ -14,6 +16,7 @@ export default function App() {
       children: [
         { path: "/", element: <HomePage /> },
         { path: "/video/:id", element: <VideoPage /> },
+        { path: "/search", element: <SearchPage /> },
       ],
     },
   ]);

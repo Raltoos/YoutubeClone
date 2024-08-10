@@ -1,17 +1,17 @@
 import { useContext, useRef, useState } from "react";
 import { SearchQueryContext } from "../store/SearchQuery/search-query-context";
-import { VideoPageContext } from "../store/VideoPage/video-page-context";
 import LoadingBar from "./ContentDisplay/LoadingBar";
 import { FaSearch } from "react-icons/fa";
 import { MdKeyboardVoice } from "react-icons/md";
 import debounce from "lodash.debounce";
+import { useNavigate } from "react-router-dom";
 
 export default function SearchBar() {
   const text = useRef();
   const [searchText, setSearchText] = useState("");
+  const navigate = useNavigate();
   
   const { setSearchQuery } = useContext(SearchQueryContext);
-  const { setVideoPageOpen } = useContext(VideoPageContext);
   const [progress, setProgress] = useState(0);
 
   function handleLoadingBar() {
@@ -23,7 +23,7 @@ export default function SearchBar() {
   const handleSearch = debounce((query) => {
     handleLoadingBar()
     setSearchQuery(query);
-    setVideoPageOpen([false, "", "", ""]);
+    navigate("/search")
   }, 1000);
 
   function handleKeyDown(event) {

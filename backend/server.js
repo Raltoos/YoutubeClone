@@ -67,7 +67,7 @@ app.get('/search', async (req, res) => {
     const searchResponse = await fetchFromYouTubeAPI('search', {
       part: 'snippet',
       q: query,
-      type: 'video',
+      type: 'video, channel',
       maxResults: number,
     });
 
@@ -94,6 +94,90 @@ app.get('/search', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+app.get('/searchbar', async (req, res) => {
+  const { q: query, no: number } = req.query;
+
+  if (!query) {
+    return res.status(400).json({ error: 'Query parameter "q" is required.' });
+  }
+
+  const maxResults = parseInt(number, 10);
+  if (isNaN(maxResults) || maxResults <= 0) {
+    return res.status(400).json({ error: 'Parameter "no" must be a positive integer.' });
+  }
+
+  try {
+    const searchResponse = await fetchFromYouTubeAPI('search', {
+      part: 'snippet',
+      q: query,
+      type: 'video,channel',
+      maxResults: maxResults,
+    });
+
+    if (!searchResponse || !searchResponse.items) {
+      throw new Error('Invalid response from YouTube search API.');
+    }
+
+    const videoIds = searchResponse.items
+      .filter(item => item.id.kind === 'youtube#video')
+      .map(video => video.id.videoId)
+      .join(',');
+
+    const channelIds = searchResponse.items
+      .filter(item => item.id.kind === 'youtube#channel')
+      .map(channel => channel.id.channelId)
+      .join(',');
+
+    const videoResponse = videoIds
+      ? await fetchFromYouTubeAPI('videos', {
+          part: 'snippet,contentDetails,statistics',
+          id: videoIds,
+        })
+      : { items: [] };
+
+    const channelResponse = channelIds
+      ? await fetchFromYouTubeAPI('channels', {
+          part: 'snippet,contentDetails,statistics',
+          id: channelIds,
+        })
+      : { items: [] };
+
+    const data = searchResponse.items.map(item => {
+      if (item.id.kind === 'youtube#video') {
+        const video = videoResponse.items.find(v => v.id === item.id.videoId);
+        return {
+          type: 'video',
+          thumbnailUrl: item.snippet.thumbnails.high.url,
+          videoTitle: item.snippet.title,
+          videoDate: timeSince(item.snippet.publishedAt),
+          viewCount: video ? convertToInternationalCurrencySystem(video.statistics.viewCount) : 'N/A',
+          channelName: item.snippet.channelTitle,
+          channelId: item.snippet.channelId,
+          videoID: item.id.videoId,
+          description: item.snippet.description,
+        };
+      } else if (item.id.kind === 'youtube#channel') {
+        const channel = channelResponse.items.find(c => c.id === item.id.channelId);
+        return {
+          type: 'channel',
+          thumbnailUrl: item.snippet.thumbnails.high.url,
+          channelTitle: item.snippet.title,
+          description: item.snippet.description,
+          channelId: item.id.channelId,
+          videoNumber: channel ? convertToInternationalCurrencySystem(channel.statistics.videoCount) : "Hidden",
+          subscriberCount: channel ? convertToInternationalCurrencySystem(channel.statistics.subscriberCount) : 'Hidden',
+        };
+      }
+    });
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching data from YouTube API:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 app.get('/video/:videoId/channel/:channelId', async (req, res) => {
   const { videoId, channelId } = req.params;
