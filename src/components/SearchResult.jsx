@@ -61,38 +61,41 @@ const SearchResultPage = () => {
           {backEndData.map((item, index) => {
             if (item.type === "channel") {
               return (
-                <div
-                  key={index}
-                  className="flex gap-10 items-center w-[1200px] justify-around p-16 cursor-pointer"
-                >
-                  <div className="flex gap-16">
-                    <div className="w-32 rounded-full">
-                      <img
-                        src={item.thumbnailUrl}
-                        className="bg-cover rounded-full"
-                      />
+                <NavLink key={index} to={`/channel/${item.channelId}`}>
+                  <div
+                    className="flex gap-10 items-center w-[1200px] justify-around p-16 cursor-pointer"
+                  >
+                    <div className="flex gap-16">
+                      <div className="w-32 rounded-full">
+                        <img
+                          src={item.thumbnailUrl}
+                          className="bg-cover rounded-full"
+                        />
+                      </div>
+                      <div className="flex flex-col text-white">
+                        <p className="text-lg">{item.channelTitle}</p>
+                        <div className="flex gap-3 mb-5 text-sm">
+                          <p>{item.subscriberCount} subscribers</p>
+                          <p>{item.videoNumber} videos</p>
+                        </div>
+                        <p>{item.description}</p>
+                      </div>
                     </div>
-                    <div className="flex flex-col text-white">
-                      <p className="text-lg">{item.channelTitle}</p>
-                      <p>{item.subscriberCount} subscribers</p>
-                      <p>{item.videoNumber} videos</p>
-                      <p>{item.description}</p>
-                    </div>
-                  </div>
 
-                  <div>
-                    <button className="bg-red-600 text-white p-2 rounded-3xl">
-                      Subscribe
-                    </button>
+                    <div>
+                      <button className="bg-red-600 text-white p-2 rounded-3xl mb-10">
+                        Subscribe
+                      </button>
+                    </div>
                   </div>
-                </div>
+                </NavLink>
               );
             } else {
               return (
                 <NavLink key={index} to={`/video/${item.videoID}`}>
                   <div
                     className="rounded-lg overflow-hidden transition-transform transform hover:scale-[101%] cursor-pointer flex gap-5 shadow-md"
-                    onClick={()=>handleClick(item)}
+                    onClick={() => handleClick(item)}
                   >
                     <div className="w-[500px] h-[280px] bg-[#272727] rounded-xl">
                       <img

@@ -8,7 +8,7 @@ const SearchPage = () => {
       <Header className="fixed top-0" />
       <div className="flex w-full justify-between">
         <div>
-          <SideBarClosed className="" />
+          <SideBarClosed />
         </div>
         <div>
           <SearchResultPage />  

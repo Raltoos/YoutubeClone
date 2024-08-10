@@ -178,6 +178,78 @@ app.get('/searchbar', async (req, res) => {
   }
 });
 
+app.get('/channel', async (req, res) => {
+  const { channelId, no: number } = req.query;
+
+  if (!channelId) {
+    return res.status(400).json({ error: 'Query parameter "channelId" is required.' });
+  }
+
+  const maxResults = parseInt(number, 10) || 10; 
+
+  try {
+    const searchResponse = await fetchFromYouTubeAPI('search', {
+      part: 'snippet',
+      channelId: channelId,
+      order: 'date', // Order by date to get the latest videos
+      maxResults: maxResults,
+      type: 'video' // Filter for videos only
+    });
+
+    // Extract video IDs
+    const videoIds = searchResponse.items
+      .map(video => video.id.videoId)
+      .join(',');
+
+    // Fetch detailed video information
+    const videoResponse = await fetchFromYouTubeAPI('videos', {
+      part: 'snippet,contentDetails,statistics',
+      id: videoIds,
+    });
+
+    // Fetch channel information
+    const channelResponse = await fetchFromYouTubeAPI('channels', {
+      part: 'snippet,brandingSettings,statistics',
+      id: channelId,
+    });
+
+    // Extract channel details
+    const channelInfo = channelResponse.items[0] || {};
+
+    // Channel banner URL
+    let bannerUrl = channelInfo.brandingSettings?.image?.bannerExternalUrl || '';
+    bannerUrl += '=w1920'
+
+    // Format and return video data along with channel information
+    const data = {
+      channel: {
+        channelId: channelInfo.id,
+        channelTitle: channelInfo.snippet.title,
+        channelDescription: channelInfo.snippet.description,
+        subscriberCount: convertToInternationalCurrencySystem(channelInfo.statistics.subscriberCount),
+        videoCount: convertToInternationalCurrencySystem(channelInfo.statistics.videoCount),
+        thumbnailUrl: channelInfo.snippet.thumbnails.high.url,
+        bannerUrl: bannerUrl,
+      },
+      videos: videoResponse.items.map(video => ({
+        thumbnailUrl: video.snippet.thumbnails.high.url,
+        videoTitle: video.snippet.title,
+        videoDate: timeSince(video.snippet.publishedAt),
+        viewCount: convertToInternationalCurrencySystem(video.statistics.viewCount),
+        channelName: video.snippet.channelTitle,  
+        channelId: video.snippet.channelId,
+        videoID: video.id,
+        description: video.snippet.description,
+      }))
+    };
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching data from YouTube API:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 app.get('/video/:videoId/channel/:channelId', async (req, res) => {
   const { videoId, channelId } = req.params;
