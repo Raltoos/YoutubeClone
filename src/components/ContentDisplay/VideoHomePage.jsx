@@ -9,8 +9,8 @@ import {
   MdOutlineKeyboardArrowLeft,
 } from "react-icons/md";
 
-export default function VideoHomePage({ isOpen }) {
-  const [progress, setProgress] = useState(0);
+export default function VideoHomePage({ isOpen, progress, setProgress }) {
+  
   const [translation, setTranslation] = useState(0);
 
   function handleLoadingBar() {

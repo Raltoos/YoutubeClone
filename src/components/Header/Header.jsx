@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { auth, provider, signInWithPopup } from "../../firebase";
-import { useContext } from "react";
+import { signOut } from 'firebase/auth';
+import { useContext, useState } from "react";
 import { UserAuthContext } from "../../store/Auth/user-auth-context";
 import { FaBars, FaYoutube } from "react-icons/fa";
 import { AiOutlineVideoCameraAdd } from "react-icons/ai";
@@ -11,11 +12,13 @@ import { useNavigate } from "react-router-dom";
 
 export default function Header({ handleToggle }) {
   const { user, setUser } = useContext(UserAuthContext);
+  const [open, setOpen] = useState(false);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  console.log(user);
 
   function handleClick() {
-    navigate("../")
+    navigate("../");
   }
 
   const handleSignIn = async () => {
@@ -27,6 +30,16 @@ export default function Header({ handleToggle }) {
       console.error("Error during Google sign-in:", error.message);
     }
   };
+
+  const handleSignOut = async () => {
+    try {
+        await signOut(auth);
+        setUser(null); // Clear the user state after signing out
+        console.log("Successfully signed out.");
+    } catch (error) {
+        console.error("Error during sign-out:", error.message);
+    }
+};
 
   return (
     <div className="bg-background h-16 p-2 w-screen flex items-center justify-between">
@@ -52,7 +65,19 @@ export default function Header({ handleToggle }) {
         <div className="flex gap-8 mr-2">
           <AiOutlineVideoCameraAdd color="white" size="2rem" />
           <IoMdNotificationsOutline color="white" size="2rem" />
-          <CgProfile color="white" size="2rem" />
+          <div
+            className="w-8 rounded h-full cursor-pointer"
+            onClick={() => setOpen(prev => !prev)}
+          >
+            <img src={user.photoURL} className="object-cover rounded-full" />
+            {open && (
+                <div className="absolute top-0 right-[60px] mt-2 w-52 bg-[#282828] border border-gray-300 rounded shadow-lg z-10 text-white">
+                    <p className="p-2 hover:bg-[#45454568] cursor-pointer">{user.displayName}</p>
+                    <p className="p-2 hover:bg-[#45454568] cursor-pointer">{user.email}</p>
+                    <p className="p-2 hover:bg-[#45454568] cursor-pointer" onClick={handleSignOut}>Logout</p>
+                </div>
+            )}
+          </div>
         </div>
       ) : (
         <div
