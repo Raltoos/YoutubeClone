@@ -7,6 +7,7 @@ import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai";
 import { RiShareForwardLine } from "react-icons/ri";
 import { GoDownload } from "react-icons/go";
 import { BsThreeDots } from "react-icons/bs";
+import { NavLink } from "react-router-dom";
 import { UserAuthContext } from "../../store/Auth/user-auth-context";
 
 const VideoDescription = ({ videoId, channelId, videoDate }) => {
@@ -140,12 +141,14 @@ const VideoDescription = ({ videoId, channelId, videoDate }) => {
               alt="channel logo"
               className="w-10 h-10 rounded-full"
             />
-            <div className="w-40 flex flex-col">
-              <h3 className="text-sm">{backEndData.channelInfo.title}</h3>
-              <h4 className="text-xs font-innterTight">
-                {backEndData.channelInfo.subscriberCount} subscribers
-              </h4>
-            </div>
+            <NavLink to={`/channel/${channelId}`}>
+              <div className="w-40 flex flex-col">
+                <h3 className="text-sm">{backEndData.channelInfo.title}</h3>
+                <h4 className="text-xs font-innterTight">
+                  {backEndData.channelInfo.subscriberCount} subscribers
+                </h4>
+              </div>
+            </NavLink>
             <button className="ml-4 px-3 bg-white text-sm text-black rounded-3xl">
               Subscribe
             </button>

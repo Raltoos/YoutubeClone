@@ -1,5 +1,6 @@
 import { useState } from "react";
 import AppContent from "../components/AppContent";
+import Header from "../components/Header/Header";
 
 const HomePage = () => {
   const [isSideBarOpen, setIsSideBarOpen] = useState(true);
@@ -8,7 +9,8 @@ const HomePage = () => {
     setIsSideBarOpen((prev) => !prev);
   }
   return (
-    <div>
+    <div className="w-screen h-screen overflow-x-hidden">
+      <Header handleToggle={handleToggleSideBar} />
       <AppContent
         handleToggleSideBar={handleToggleSideBar}
         isSideBarOpen={isSideBarOpen}

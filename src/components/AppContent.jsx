@@ -29,8 +29,6 @@ export default function AppContent({ handleToggleSideBar, isSideBarOpen }) {
 
   return (
     <div className="w-screen h-screen bg-[#0f0f0f] font-sans flex flex-col overflow-hidden">
-      <Header handleToggle={handleToggleSideBar} />
-      <div className="h-screen">
         <div className="flex">
           {isSideBarOpen ? (
             <SideBar handleExploreClick={handleExploreClick} handleLoadingBar={handleLoadingBar}/>
@@ -43,7 +41,6 @@ export default function AppContent({ handleToggleSideBar, isSideBarOpen }) {
             setProgress={setProgress}
           />
         </div>
-      </div>
     </div>
   );
 }

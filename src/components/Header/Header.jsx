@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { FaBars, FaYoutube } from "react-icons/fa";
@@ -14,6 +14,7 @@ export default function Header({ handleToggle }) {
   const [open, setOpen] = useState(false);
   const [profile, setProfile] = useState(null);
   const { user, setUser } = useContext(UserAuthContext);
+  const navigate = useNavigate();
 
   const login = useGoogleLogin({
     onSuccess: (response) => {
@@ -38,23 +39,34 @@ export default function Header({ handleToggle }) {
         }
       );
 
-      setProfile(response.data);
+      const profileData = response.data;
+      setProfile(profileData);
+
+      // Store profile picture in local storage
+      localStorage.setItem("profilePicture", profileData.picture);
     } catch (error) {
       console.error("Error fetching profile info:", error);
     }
   };
 
-  if (user) {
-    fetchProfileInfo(user).catch((error) => {
-      console.error("Failed to fetch profile info:", error);
-    });
-  }
+  useEffect(() => {
+    if (user) {
+      fetchProfileInfo(user).catch((error) => {
+        console.error("Failed to fetch profile info:", error);
+      });
+    } else {
+      // Check local storage for profile picture
+      const storedPicture = localStorage.getItem("profilePicture");
+      if (storedPicture) {
+        setProfile((prevProfile) => ({ ...prevProfile, picture: storedPicture }));
+      }
+    }
+  }, [user]);
 
   function handleSignOut() {
     setUser(null);
+    localStorage.removeItem("profilePicture"); // Remove profile picture from local storage on sign out
   }
-
-  const navigate = useNavigate();
 
   function handleClick() {
     navigate("../");
@@ -92,7 +104,7 @@ export default function Header({ handleToggle }) {
             className="w-8 rounded h-full cursor-pointer"
             onClick={() => setOpen((prev) => !prev)}
           >
-            <img src={profile.picture} className="object-cover rounded-full" />
+            <img src={profile.picture} className="object-cover rounded-full" alt="Profile" />
             {open && (
               <div className="absolute top-0 right-[60px] mt-2 w-52 bg-[#282828] border border-gray-300 rounded shadow-lg z-10 text-white">
                 <p className="p-2 hover:bg-[#45454568] cursor-pointer">
