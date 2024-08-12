@@ -1,45 +1,64 @@
 /* eslint-disable react/prop-types */
-import { auth, provider, signInWithPopup } from "../../firebase";
-import { signOut } from 'firebase/auth';
 import { useContext, useState } from "react";
-import { UserAuthContext } from "../../store/Auth/user-auth-context";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
 import { FaBars, FaYoutube } from "react-icons/fa";
 import { AiOutlineVideoCameraAdd } from "react-icons/ai";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 import SearchBar from "../SearchBar.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
+import { UserAuthContext } from "../../store/Auth/user-auth-context.jsx";
 
 export default function Header({ handleToggle }) {
-  const { user, setUser } = useContext(UserAuthContext);
   const [open, setOpen] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const { user, setUser } = useContext(UserAuthContext);
+
+  const login = useGoogleLogin({
+    onSuccess: (response) => {
+      setUser(response.access_token);
+      console.log("Login successful:", response);
+    },
+    onError: (error) => {
+      console.error("Login error:", error);
+    },
+    scope:
+      "profile email openid https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/youtubepartner",
+  });
+
+  const fetchProfileInfo = async (accessToken) => {
+    try {
+      const response = await axios.get(
+        "https://www.googleapis.com/oauth2/v3/userinfo",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      setProfile(response.data);
+    } catch (error) {
+      console.error("Error fetching profile info:", error);
+    }
+  };
+
+  if (user) {
+    fetchProfileInfo(user).catch((error) => {
+      console.error("Failed to fetch profile info:", error);
+    });
+  }
+
+  function handleSignOut() {
+    setUser(null);
+  }
 
   const navigate = useNavigate();
-  console.log(user);
 
   function handleClick() {
     navigate("../");
   }
-
-  const handleSignIn = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      setUser(user);
-    } catch (error) {
-      console.error("Error during Google sign-in:", error.message);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-        await signOut(auth);
-        setUser(null); // Clear the user state after signing out
-        console.log("Successfully signed out.");
-    } catch (error) {
-        console.error("Error during sign-out:", error.message);
-    }
-};
 
   return (
     <div className="bg-background h-16 p-2 w-screen flex items-center justify-between">
@@ -61,28 +80,41 @@ export default function Header({ handleToggle }) {
         </div>
       </div>
       <SearchBar />
-      {user ? (
+      {user && profile ? (
         <div className="flex gap-8 mr-2">
-          <AiOutlineVideoCameraAdd color="white" size="2rem" />
+          <NavLink to="/upload">
+            <div className="cursor-pointer">
+              <AiOutlineVideoCameraAdd color="white" size="2rem" />
+            </div>
+          </NavLink>
           <IoMdNotificationsOutline color="white" size="2rem" />
           <div
             className="w-8 rounded h-full cursor-pointer"
-            onClick={() => setOpen(prev => !prev)}
+            onClick={() => setOpen((prev) => !prev)}
           >
-            <img src={user.photoURL} className="object-cover rounded-full" />
+            <img src={profile.picture} className="object-cover rounded-full" />
             {open && (
-                <div className="absolute top-0 right-[60px] mt-2 w-52 bg-[#282828] border border-gray-300 rounded shadow-lg z-10 text-white">
-                    <p className="p-2 hover:bg-[#45454568] cursor-pointer">{user.displayName}</p>
-                    <p className="p-2 hover:bg-[#45454568] cursor-pointer">{user.email}</p>
-                    <p className="p-2 hover:bg-[#45454568] cursor-pointer" onClick={handleSignOut}>Logout</p>
-                </div>
+              <div className="absolute top-0 right-[60px] mt-2 w-52 bg-[#282828] border border-gray-300 rounded shadow-lg z-10 text-white">
+                <p className="p-2 hover:bg-[#45454568] cursor-pointer">
+                  {profile.name}
+                </p>
+                <p className="p-2 hover:bg-[#45454568] cursor-pointer">
+                  {profile.email}
+                </p>
+                <p
+                  className="p-2 hover:bg-[#45454568] cursor-pointer"
+                  onClick={handleSignOut}
+                >
+                  Logout
+                </p>
+              </div>
             )}
           </div>
         </div>
       ) : (
         <div
           className="flex justify-center items-center gap-1 mr-2 border border-highlight p-2 rounded-3xl hover:bg-[#3ca3f75a] cursor-pointer"
-          onClick={handleSignIn}
+          onClick={login}
         >
           <CgProfile color="#3CA3F7" size="1.7rem" />
           <p className="text-[#3CA3F7] w-[50px]">Sign In</p>

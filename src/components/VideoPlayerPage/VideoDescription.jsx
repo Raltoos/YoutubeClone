@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 
 import ImagePreloader from "./ImagePreLoader";
@@ -7,12 +7,16 @@ import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai";
 import { RiShareForwardLine } from "react-icons/ri";
 import { GoDownload } from "react-icons/go";
 import { BsThreeDots } from "react-icons/bs";
+import { UserAuthContext } from "../../store/Auth/user-auth-context";
 
 const VideoDescription = ({ videoId, channelId, videoDate }) => {
+  const { user } = useContext(UserAuthContext);
   const [backEndData, setBackEndData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [commentText, setCommentText] = useState("");
 
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -41,7 +45,29 @@ const VideoDescription = ({ videoId, channelId, videoDate }) => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  // Prepare image URLs for preloading and for comments
+  const fetchProfileInfo = async (accessToken) => {
+    try {
+      const response = await axios.get(
+        "https://www.googleapis.com/oauth2/v3/userinfo",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      setProfile(response.data);
+    } catch (error) {
+      console.error("Error fetching profile info:", error);
+    }
+  };
+
+  if (user) {
+    fetchProfileInfo(user).catch((error) => {
+      console.error("Failed to fetch profile info:", error);
+    });
+  }
+
   const commentsWithImages = backEndData.comments.map((comment) => ({
     ...comment,
     imageUrl: comment.authorProfileImageUrl,
@@ -57,10 +83,53 @@ const VideoDescription = ({ videoId, channelId, videoDate }) => {
     setIsExpanded(!isExpanded);
   };
 
+  function handleComment(e) {
+    e.preventDefault();
+    console.log(user);
+
+    const requestBody = {
+      snippet: {
+        topLevelComment: {
+          snippet: {
+            textOriginal: commentText,
+          },
+        },
+        videoId: videoId,
+      },
+    };
+
+    axios
+      .post(
+        "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet",
+        requestBody,
+        {
+          headers: {
+            Authorization: `Bearer ${user}`,
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        console.log("Comment posted successfully:", response.data);
+        setCommentText("");
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.error("Error response:", error.response.data);
+          console.error("Error status:", error.response.status);
+          console.error("Error headers:", error.response.headers);
+        } else if (error.request) {
+          console.error("Error request:", error.request);
+        } else {
+          console.error("Error message:", error.message);
+        }
+      });
+  }
+
   return (
     <div className="w-screen">
+      <ImagePreloader imageUrls={imageUrls} onLoaded={handleImagesLoaded} />
       <div className="h-fit w-[900px] mt-5 text-white flex flex-col">
-        <ImagePreloader imageUrls={imageUrls} onLoaded={handleImagesLoaded} />
         <h2 className="text-2xl font-semibold p-2">
           {backEndData.videoInfo.title}
         </h2>
@@ -68,7 +137,7 @@ const VideoDescription = ({ videoId, channelId, videoDate }) => {
           <div className="flex gap-3">
             <img
               src={backEndData.channelInfo.thumbnailUrl}
-              alt='channel logo'
+              alt="channel logo"
               className="w-10 h-10 rounded-full"
             />
             <div className="w-40 flex flex-col">
@@ -132,6 +201,31 @@ const VideoDescription = ({ videoId, channelId, videoDate }) => {
         {imagesLoaded ? (
           <div className="h-fit w-full mt-10 pb-24">
             <h2 className="text-xl font-semibold p-2">Comments</h2>
+            {user && profile && (
+              <div className="text-white my-2">
+                <form onSubmit={handleComment} className="flex flex-col">
+                  <div className="flex gap-5 h-[50px] items-center">
+                    <div className="w-[40px]">
+                      <img
+                        src={profile.picture}
+                        alt=""
+                        className="rounded-full object-cover"
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      className="w-[98%] bg-inherit border-b border-b-white focus:outline-none"
+                      placeholder="Comment"
+                    />
+                    <div className="self-end mr-5 bg-[#3EA6FF] p-2 rounded-3xl">
+                      <button>Comment</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            )}
             <div className="flex flex-col gap-2">
               {commentsWithImages.map((comment, indx) => {
                 return (

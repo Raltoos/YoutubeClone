@@ -8,6 +8,7 @@ import VideoPage from "./pages/Video.jsx";
 import ErrorPage from "./pages/Error.jsx";
 import SearchPage from "./pages/Search.jsx";
 import ChannelPage from "./pages/Channel.jsx";
+import SubscriptionsPage from "./pages/Subscriptions.jsx";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -18,6 +19,7 @@ export default function App() {
         { path: "/video/:id", element: <VideoPage /> },
         { path: "/search", element: <SearchPage /> },
         { path: "/channel/:id", element: <ChannelPage /> },
+        { path: "/subscriptions", element: <SubscriptionsPage /> },
       ],
     },
   ]);

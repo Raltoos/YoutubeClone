@@ -56,7 +56,8 @@ const ChannelResultPage = ({ channelId }) => {
       <div className="w-[1300px] h-[204px] mt-2">
         <img
           src={backEndData.channel.bannerUrl}
-          className="object-cover w-[1300px] h-[202px] rounded-xl"
+          alt="No Channel Banner Available"
+          className="object-cover w-[1300px] h-[202px] rounded-xl text-white"
         />
       </div>
       <div className="h-[200px] flex items-center ml-16 self-start">

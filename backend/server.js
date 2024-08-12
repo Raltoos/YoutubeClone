@@ -260,7 +260,7 @@ app.get('/video/:videoId/channel/:channelId', async (req, res) => {
       fetchFromYouTubeAPI('commentThreads', {
         part: 'snippet',
         videoId: videoId,
-        maxResults: 20,
+        maxResults: 15,
       }),
       fetchFromYouTubeAPI('channels', {
         part: 'snippet,statistics',
@@ -301,43 +301,6 @@ app.get('/video/:videoId/channel/:channelId', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-// app.get('/subscriptions', async (req, res) => {
-//   const idToken = req.headers.authorization?.split('Bearer ')[1]; // Extract Firebase ID token from Authorization header
-
-//   if (!idToken) {
-//       return res.status(400).send('ID token is required');
-//   }
-
-//   try {
-//       // Verify Firebase ID token
-//       const decodedToken = await admin.auth().verifyIdToken(idToken);
-//       console.log('User ID:', decodedToken.uid);
-
-//       // Fetch YouTube subscriptions
-//       const response = await axios.get('https://www.googleapis.com/youtube/v3/subscriptions', {
-//           params: {
-//               part: 'snippet',
-//               mine: true,
-//               maxResults: 20,
-//               key: YOUTUBE_API_KEY
-//           },
-//           headers: {
-//               Authorization: `Bearer ${idToken}`
-//           }
-//       });
-
-//       const subscriptions = response.data.items;
-//       res.json(subscriptions);
-//   } catch (error) {
-//       console.error('Error:', error.message);
-//       if (error.code === 'auth/argument-error') {
-//           res.status(401).send('Invalid ID token');
-//       } else {
-//           res.status(500).send('Error fetching subscriptions');
-//       }
-//   }
-// });
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

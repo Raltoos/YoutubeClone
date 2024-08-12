@@ -24,6 +24,6 @@ const ImagePreloader = ({ imageUrls, onLoaded }) => {
     loadImages();
   }, [imageUrls, onLoaded]);
 
-  // return null;
+  return null;
 };
 export default ImagePreloader;
